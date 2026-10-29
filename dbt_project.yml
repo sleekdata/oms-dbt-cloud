@@ -1,8 +1,6 @@
-
 name: 'oms_analytics'
 version: '1.0.0'
 config-version: 2
-
 
 profile: 'default'
 
@@ -13,13 +11,10 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target" 
-clean-targets:  
+target-path: "target"
+clean-targets:
   - "target"
   - "dbt_packages"
-
-# You can apply hooks at the folder level (applies to all models in the folder)
-# or at the individual model level. Hooks can be defined as inline SQL or as macros.
 
 models:
   oms_analytics:
@@ -27,17 +22,17 @@ models:
     +materialized: table
     +transient: false
 
-    # Folder-level hooks example using macros
     customer_rev:
-      +pre_hook: "{{ log_start_time(this) }}"
-      +post_hook: "{{ log_end_time(this) }}"
+      +meta:
+        pre_hook: "{{ log_start_time(this) }}"
+        post_hook: "{{ log_end_time(this) }}"
 
-    # Individual model-level hooks example using inline SQL
     hooks-demo:
       cust_orders_11:
-        +pre_hook: |
-          INSERT INTO audit.model_runs (model_name, run_type, run_timestamp)
-          VALUES ('{{ this }}', 'start', CURRENT_TIMESTAMP)
-        +post_hook: |
-          INSERT INTO audit.model_runs (model_name, run_type, run_timestamp)
-          VALUES ('{{ this }}', 'end', CURRENT_TIMESTAMP)
+        +meta:
+          pre_hook: |
+            INSERT INTO audit.model_runs (model_name, run_type, run_timestamp)
+            VALUES ('{{ this }}', 'start', CURRENT_TIMESTAMP)
+          post_hook: |
+            INSERT INTO audit.model_runs (model_name, run_type, run_timestamp)
+            VALUES ('{{ this }}', 'end', CURRENT_TIMESTAMP)
