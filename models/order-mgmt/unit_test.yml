@@ -1,0 +1,36 @@
+version: 2
+
+unit_tests:
+  - name: test_total_amount
+    description: Test total amount calculations
+    model: order_details
+
+    given:
+      - input: ref('order_line_items_joined')
+        rows:
+          - {order_id: 1001, quantity: 2, unit_price: 50.00, discount_percentage: 10.00}
+          - {order_id: 1004, quantity: 2, unit_price: 75.00, discount_percentage: null}
+
+    expect:
+      rows:
+        - {order_id: 1001, total_amount: 90.00}
+        - {order_id: 1004, total_amount: 150.00}
+
+  - name: test_delivery_performance_category
+    description: Test all delivery performance categories
+    model: order_details
+
+    given:
+      - input: ref('order_line_items_joined')
+        rows:
+          - {order_id: 1001, expected_delivery_date: '2026-10-10', actual_delivery_date: '2026-10-08'}
+          - {order_id: 1002, expected_delivery_date: '2026-10-12', actual_delivery_date: '2026-10-12'}
+          - {order_id: 1003, expected_delivery_date: '2026-10-15', actual_delivery_date: '2026-10-18'}
+          - {order_id: 1004, expected_delivery_date: '2026-10-20', actual_delivery_date: null}
+
+    expect:
+      rows:
+        - {order_id: 1001, delivery_performance_category: 'Early'}
+        - {order_id: 1002, delivery_performance_category: 'On Time'}
+        - {order_id: 1003, delivery_performance_category: 'Late'}
+        - {order_id: 1004, delivery_performance_category: 'Unknown'}
